@@ -226,13 +226,13 @@ export default defineComponent({
     top: 100%;
   }
   100% {
-    top: -1000%;
+    top: -45%;
   }
 }
 
 .q-timeline {
   position: absolute;
   top: 0%;
-  animation: scroll 180s linear -8s forwards;
+  animation: scroll 10s linear 1s forwards;
 }
 </style>
