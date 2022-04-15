@@ -17,82 +17,82 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      # About and Help
-    </q-drawer>
+    <q-drawer v-model="leftDrawerOpen" bordered> # About and Help </q-drawer>
 
     <q-page-container>
-      <div class="q-px-lg q-pb-md">
-        <q-timeline :layout="loose" color="secondary">
-          <q-timeline-entry heading> SpaceX Launches </q-timeline-entry>
-          <q-timeline-entry
-            title="Sentinel-6 Michael Freilich"
-            subtitle="2020-11-21T17:17:00.000Z"
-            side="left"
-          >
-            <q-card class="my-card">
-              <q-list>
-                <q-item clickable>
-                  <q-item-section avatar>
-                    <q-icon color="primary" name="rocket" />
-                  </q-item-section>
+      <q-page>
+        <div v-if="loading">Loading...</div>
+        <div v-else-if="error">Error: {{ error.message }}</div>
+        <div v-else-if="result && result.launchesPast">
+          <q-timeline :layout="loose" color="secondary">
+            <q-timeline-entry heading> SpaceX Launches </q-timeline-entry>
+            <q-timeline-entry
+              v-for="launch in result.launchesPast"
+              :key="launch.id"
+              :title="launch.mission_name"
+              :subtitle="launch.launch_date_local"
+              side="left"
+            >
+              <q-card class="my-card">
+                <q-list>
+                  <q-item clickable>
+                    <q-item-section avatar>
+                      <q-icon color="primary" name="rocket" />
+                    </q-item-section>
 
-                  <q-item-section>
-                    <q-item-label>Falcon 9</q-item-label>
-                    <q-item-label caption>Main Rocket</q-item-label>
-                  </q-item-section>
-                </q-item>
+                    <q-item-section>
+                      <q-item-label>{{
+                        launch.rocket.rocket_name
+                      }}</q-item-label>
+                      <q-item-label caption>Main Rocket</q-item-label>
+                    </q-item-section>
+                  </q-item>
 
-                <q-item clickable>
-                  <q-item-section avatar>
-                    <q-icon color="red" name="flight_takeoff" />
-                  </q-item-section>
+                  <q-item clickable>
+                    <q-item-section avatar>
+                      <q-icon color="red" name="flight_takeoff" />
+                    </q-item-section>
 
-                  <q-item-section>
-                    <q-item-label
-                      >Vandenberg Air Force Base Space Launch Complex
-                      4E</q-item-label
-                    >
-                    <q-item-label caption>Mission Site</q-item-label>
-                  </q-item-section>
-                </q-item>
+                    <q-item-section>
+                      <q-item-label>{{
+                        launch.launch_site.site_name_long
+                      }}</q-item-label>
+                      <q-item-label caption>Mission Site</q-item-label>
+                    </q-item-section>
+                  </q-item>
 
-                <q-item clickable>
-                  <q-item-section avatar>
-                    <q-icon color="amber" name="inventory" />
-                  </q-item-section>
+                  <q-item clickable>
+                    <q-item-section avatar>
+                      <q-icon color="amber" name="inventory" />
+                    </q-item-section>
 
-                  <q-item-section>
-                    <q-item-label>Satellite</q-item-label>
-                    <q-item-label caption>Payload</q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-list>
+                    <q-item-section>
+                      <q-item-label v-if="(launch_success = 'true')"
+                        >Success</q-item-label
+                      >
+                      <q-item-label v-else>Failure</q-item-label>
+                      <q-item-label caption>Status</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
 
-              <q-video
-                :ratio="16 / 9"
-                src="https://www.youtube.com/embed/aVFPzTDCihQ"
-              />
-
-              <div>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </div>
-            </q-card>
-          </q-timeline-entry>
-        </q-timeline>
-      </div>
+                <q-video
+                  :ratio="16 / 9"
+                  :src="getYoutubeEmbedLink(launch.links.video_link)"
+                />
+              </q-card>
+            </q-timeline-entry>
+          </q-timeline>
+        </div>
+      </q-page>
     </q-page-container>
   </q-layout>
 </template>
 
 <script>
 import { defineComponent, ref } from "vue";
+import { useQuery } from "@vue/apollo-composable";
+import gql from "graphql-tag";
 
 export default defineComponent({
   name: "MainLayout",
@@ -100,12 +100,39 @@ export default defineComponent({
   components: {},
 
   setup() {
-    const leftDrawerOpen = ref(true);
+    const leftDrawerOpen = ref(false);
+
+    const { result, loading, error } = useQuery(gql`
+      query getLaunches {
+        launchesPast(limit: 10) {
+          mission_name
+          launch_date_local
+          launch_site {
+            site_name
+            site_name_long
+          }
+          links {
+            video_link
+          }
+          rocket {
+            rocket_name
+          }
+          launch_success
+          id
+        }
+      }
+    `);
 
     return {
       leftDrawerOpen,
+      result,
+      loading,
+      error,
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;
+      },
+      getYoutubeEmbedLink(link) {
+        return "https://www.youtube.com/embed/" + /[^/]*$/.exec(link)[0];
       },
     };
   },
