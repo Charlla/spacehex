@@ -31,12 +31,12 @@
           <q-timeline layout="loose" color="secondary" class="timeline">
             <q-timeline-entry heading> SpaceX Launches </q-timeline-entry>
             <q-timeline-entry
-              v-for="launch in result.launchesPast"
+              v-for="(launch, index) in result.launchesPast"
               :key="launch.id"
               :title="launch.mission_name"
               :subtitle="launch.launch_date_local"
               :side="getTimelineSide()"
-              @click="carousel = true"
+              @click="showImages(index)"
             >
               <q-card class="my-card">
                 <q-list>
@@ -97,10 +97,24 @@
         <q-dialog v-model="carousel">
           <q-card style="width: 700px; max-width: 80vw">
             <q-card-section>
-              <div class="text-h6">Mission Images</div>
+              <div class="text-h6">
+                Mission Images for
+                {{ result.launchesPast[getClickedLaunchIndex()].mission_name }}
+              </div>
             </q-card-section>
             <q-card-section>
+              <q-banner
+                v-if="
+                  result.launchesPast[getClickedLaunchIndex()].links
+                    .flickr_images[0] == null
+                "
+                >No images available for this mission</q-banner
+              >
               <q-carousel
+                v-if="
+                  result.launchesPast[getClickedLaunchIndex()].links
+                    .flickr_images[0] != null
+                "
                 navigation
                 infinite
                 :autoplay="5000"
@@ -109,8 +123,9 @@
               >
                 <q-carousel-slide
                   :name="index"
-                  v-for="(item, index) in result.launchesPast[1].links
-                    .flickr_images"
+                  v-for="(item, index) in result.launchesPast[
+                    getClickedLaunchIndex()
+                  ].links.flickr_images"
                   :key="index"
                   :img-src="item"
                 />
@@ -135,7 +150,9 @@ export default defineComponent({
 
   setup() {
     const leftDrawerOpen = ref(false);
+    const carousel = ref(false);
     const layoutSide = ref("left");
+    const missionIndex = ref(1);
 
     const { result, loading, error } = useQuery(gql`
       query getLaunches {
@@ -164,8 +181,9 @@ export default defineComponent({
       result,
       loading,
       error,
-      carousel: ref(false),
+      carousel,
       slide: ref(1),
+      missionIndex,
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;
       },
@@ -179,6 +197,14 @@ export default defineComponent({
       getImageIndex() {
         imageIndex.value = imageIndex.value + 1;
         return imageIndex.value;
+      },
+      getClickedLaunchIndex() {
+        return missionIndex.value;
+      },
+      showImages(index) {
+        carousel.value = true;
+        missionIndex.value = index;
+        return missionIndex.value;
       },
     };
   },
