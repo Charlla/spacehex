@@ -36,6 +36,7 @@
               :title="launch.mission_name"
               :subtitle="launch.launch_date_local"
               :side="getTimelineSide()"
+              @click="carousel = true"
             >
               <q-card class="my-card">
                 <q-list>
@@ -54,7 +55,7 @@
 
                   <q-item clickable>
                     <q-item-section avatar>
-                      <q-icon color="red" name="flight_takeoff" />
+                      <q-icon color="primary" name="flight_takeoff" />
                     </q-item-section>
 
                     <q-item-section>
@@ -67,7 +68,12 @@
 
                   <q-item clickable>
                     <q-item-section avatar>
-                      <q-icon color="amber" name="inventory" />
+                      <q-icon
+                        v-if="(launch_success = 'true')"
+                        color="green"
+                        name="check_circle"
+                      />
+                      <q-icon v-else color="green" name="check_circle" />
                     </q-item-section>
 
                     <q-item-section>
@@ -88,6 +94,30 @@
             </q-timeline-entry>
           </q-timeline>
         </div>
+        <q-dialog v-model="carousel">
+          <q-card style="width: 700px; max-width: 80vw">
+            <q-card-section>
+              <div class="text-h6">Mission Images</div>
+            </q-card-section>
+            <q-card-section>
+              <q-carousel
+                navigation
+                infinite
+                :autoplay="5000"
+                arrows
+                v-model="slide"
+              >
+                <q-carousel-slide
+                  :name="index"
+                  v-for="(item, index) in result.launchesPast[1].links
+                    .flickr_images"
+                  :key="index"
+                  :img-src="item"
+                />
+              </q-carousel>
+            </q-card-section>
+          </q-card>
+        </q-dialog>
       </q-page>
     </q-page-container>
   </q-layout>
@@ -118,6 +148,7 @@ export default defineComponent({
           }
           links {
             video_link
+            flickr_images
           }
           rocket {
             rocket_name
@@ -133,6 +164,8 @@ export default defineComponent({
       result,
       loading,
       error,
+      carousel: ref(false),
+      slide: ref(1),
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;
       },
@@ -142,6 +175,10 @@ export default defineComponent({
       getTimelineSide() {
         layoutSide.value = layoutSide.value == "left" ? "right" : "left";
         return layoutSide.value;
+      },
+      getImageIndex() {
+        imageIndex.value = imageIndex.value + 1;
+        return imageIndex.value;
       },
     };
   },
@@ -223,7 +260,7 @@ export default defineComponent({
   -moz-animation: intro 2s ease-out;
   -ms-animation: intro 2s ease-out;
   -o-animation: intro 2s ease-out;
-  animation: intro 10s ease-out;
+  animation: intro 8s ease-out;
 }
 
 @keyframes scroll {
@@ -235,21 +272,9 @@ export default defineComponent({
   }
 }
 
-.q-timelineff {
-  position: absolute;
-  top: 0%;
-  animation: scroll 10s linear 1s forwards;
-}
-
 .timeline {
   position: absolute;
   top: 100%;
-  animation: scroll 10s linear 1s forwards;
-}
-
-.timelineReverse + verse {
-  position: absolute;
-  top: 0%;
   animation: scroll 10s linear 1s forwards;
 }
 
