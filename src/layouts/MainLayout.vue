@@ -104,10 +104,15 @@
                   </q-item>
                 </q-list>
 
-                <q-video
+                <q-img
+                v-if="launch.links.flickr_images != null &&
+                  launch.links.flickr_images[0] != null"
+                  :src="launch.links.flickr_images[0]"
+              />
+                <!-- <q-video
                   :ratio="16 / 9"
                   :src="getYoutubeEmbedLink(launch.links.video_link)"
-                />
+                /> -->
               </q-card>
             </q-timeline-entry>
           </q-timeline>
@@ -123,15 +128,13 @@
             <q-card-section>
               <q-banner
                 v-if="
-                  result.launchesPast[getClickedLaunchIndex()].links
-                    .flickr_images[0] == null
+                  result.launchesPast[getClickedLaunchIndex()].links.flickr_images[0] == null
                 "
                 >No images available for this mission</q-banner
               >
               <q-carousel
                 v-if="
-                  result.launchesPast[getClickedLaunchIndex()].links
-                    .flickr_images[0] != null
+                  result.launchesPast[getClickedLaunchIndex()].links.flickr_images[0] != null
                 "
                 navigation
                 infinite
