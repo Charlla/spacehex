@@ -28,14 +28,14 @@
         <div v-if="loading">Loading...</div>
         <div v-else-if="error">Error: {{ error.message }}</div>
         <div v-else-if="result && result.launchesPast">
-          <q-timeline :layout="loose" color="secondary" class="timeline">
+          <q-timeline layout="loose" color="secondary" class="timeline">
             <q-timeline-entry heading> SpaceX Launches </q-timeline-entry>
             <q-timeline-entry
               v-for="launch in result.launchesPast"
               :key="launch.id"
               :title="launch.mission_name"
               :subtitle="launch.launch_date_local"
-              side="left"
+              :side="getTimelineSide()"
             >
               <q-card class="my-card">
                 <q-list>
@@ -105,6 +105,7 @@ export default defineComponent({
 
   setup() {
     const leftDrawerOpen = ref(false);
+    const layoutSide = ref("left");
 
     const { result, loading, error } = useQuery(gql`
       query getLaunches {
@@ -137,6 +138,10 @@ export default defineComponent({
       },
       getYoutubeEmbedLink(link) {
         return "https://www.youtube.com/embed/" + /[^/]*$/.exec(link)[0];
+      },
+      getTimelineSide() {
+        layoutSide.value = layoutSide.value == "left" ? "right" : "left";
+        return layoutSide.value;
       },
     };
   },
@@ -242,9 +247,14 @@ export default defineComponent({
   animation: scroll 10s linear 1s forwards;
 }
 
-.timelineRe*- + verse {
+.timelineReverse + verse {
   position: absolute;
   top: 0%;
   animation: scroll 10s linear 1s forwards;
+}
+
+.q-timeline__subtitle {
+  font-size: 200%;
+  font-weight: 400;
 }
 </style>
