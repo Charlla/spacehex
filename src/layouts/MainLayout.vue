@@ -28,7 +28,7 @@
         <div v-if="loading">Loading...</div>
         <div v-else-if="error">Error: {{ error.message }}</div>
         <div v-else-if="result && result.launchesPast">
-          <q-timeline :layout="loose" color="secondary">
+          <q-timeline :layout="loose" color="secondary" class="timeline">
             <q-timeline-entry heading> SpaceX Launches </q-timeline-entry>
             <q-timeline-entry
               v-for="launch in result.launchesPast"
@@ -230,7 +230,19 @@ export default defineComponent({
   }
 }
 
-.q-timeline {
+.q-timelineff {
+  position: absolute;
+  top: 0%;
+  animation: scroll 10s linear 1s forwards;
+}
+
+.timeline {
+  position: absolute;
+  top: 100%;
+  animation: scroll 10s linear 1s forwards;
+}
+
+.timelineRe*- + verse {
   position: absolute;
   top: 0%;
   animation: scroll 10s linear 1s forwards;
