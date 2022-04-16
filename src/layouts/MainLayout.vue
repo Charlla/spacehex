@@ -149,6 +149,11 @@
                 />
               </q-carousel>
             </q-card-section>
+            <q-card-section>
+              <div class="text-body1">{{result.launchesPast[
+                    getClickedLaunchIndex()
+                  ].details}}</div>
+            </q-card-section>
           </q-card>
         </q-dialog>
       </q-page>
@@ -176,7 +181,7 @@ export default defineComponent({
       query getLaunches {
         launchesPast(limit: 10) {
           mission_name
-          launch_date_local
+          launch_date_utc
           launch_site {
             site_name
             site_name_long
@@ -190,6 +195,7 @@ export default defineComponent({
           }
           launch_success
           id
+          details
         }
       }
     `);
