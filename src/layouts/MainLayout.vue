@@ -53,7 +53,7 @@
               :key="launch.id"
               :title="launch.mission_name"
               :subtitle="launch.launch_date_local"
-              :side="getTimelineSide()"
+              :side="launch.id%2? 'left':'right'"
               @click="showImages(index)"
             >
               <q-card class="my-card">
@@ -321,13 +321,13 @@ export default defineComponent({
     top: 100%;
   }
   100% {
-    top: -45%;
+    top: 0%;
   }
 }
 
 .timeline {
   position: absolute;
-  top: 100%;
+  /* top: 100%; */
   animation: scroll 10s linear 1s forwards;
 }
 
