@@ -17,24 +17,14 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" side="left" overlay behavior="mobile" bordered>
-      <div class="q-pa-md q-gutter-sm text-body1">
-      <h5>About</h5>
-      <p>Welcome to SpaceHex - a little website exploring amongst other features:
-        <ul>
-          <li>SpaceX API</li>
-          <li>Vue 3 and Quasar</li>
-          <li>GraphQL in Vue (using Apollo base)</li>
-        </ul>
-      </p>
-      <h5>Features and Nav</h5>
-        <ul>
-          <li>For coolness sake, content will scroll into the main screen when the page is loaded</li>
-          <li>Click on any bar for a mission or next to the mission video to open an image gallery for the mission.</li>
-          <li>Have fun and enjoy this un-Elongated take on a SpaceX timeline...</li>
-        </ul>
-      <b>SpaceHex 2022</b>
-      </div>
+    <q-drawer
+      v-model="leftDrawerOpen"
+      side="left"
+      overlay
+      behavior="mobile"
+      bordered
+    >
+      <About />
     </q-drawer>
 
     <q-page-container>
@@ -53,7 +43,7 @@
               :key="launch.id"
               :title="launch.mission_name"
               :subtitle="launch.launch_date_local"
-              :side="launch.id%2? 'left':'right'"
+              :side="launch.id % 2 ? 'left' : 'right'"
               @click="showImages(index)"
             >
               <q-card class="my-card">
@@ -105,10 +95,12 @@
                 </q-list>
 
                 <q-img
-                v-if="launch.links.flickr_images != null &&
-                  launch.links.flickr_images[0] != null"
+                  v-if="
+                    launch.links.flickr_images != null &&
+                    launch.links.flickr_images[0] != null
+                  "
                   :src="launch.links.flickr_images[0]"
-              />
+                />
                 <!-- <q-video
                   :ratio="16 / 9"
                   :src="getYoutubeEmbedLink(launch.links.video_link)"
@@ -128,13 +120,15 @@
             <q-card-section>
               <q-banner
                 v-if="
-                  result.launchesPast[getClickedLaunchIndex()].links.flickr_images[0] == null
+                  result.launchesPast[getClickedLaunchIndex()].links
+                    .flickr_images[0] == null
                 "
                 >No images available for this mission</q-banner
               >
               <q-carousel
                 v-if="
-                  result.launchesPast[getClickedLaunchIndex()].links.flickr_images[0] != null
+                  result.launchesPast[getClickedLaunchIndex()].links
+                    .flickr_images[0] != null
                 "
                 navigation
                 infinite
@@ -153,9 +147,9 @@
               </q-carousel>
             </q-card-section>
             <q-card-section>
-              <div class="text-body1">{{result.launchesPast[
-                    getClickedLaunchIndex()
-                  ].details}}</div>
+              <div class="text-body1">
+                {{ result.launchesPast[getClickedLaunchIndex()].details }}
+              </div>
             </q-card-section>
           </q-card>
         </q-dialog>
@@ -168,11 +162,12 @@
 import { defineComponent, ref } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import gql from "graphql-tag";
+import About from "components/About.vue";
 
 export default defineComponent({
   name: "MainLayout",
 
-  components: {},
+  components: { About },
 
   setup() {
     const leftDrawerOpen = ref(false);
